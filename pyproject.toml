@@ -10,8 +10,8 @@ description = "Pydastic is an elasticsearch python ORM based on Pydantic."
 readme = "README.md"
 authors = ["pydastic <rami.awar.ra@gmail.com>"]
 license = "MIT"
-repository = "https://github.com/pydastic/pydastic"
-homepage = "https://github.com/pydastic/pydastic"
+repository = "https://github.com/ramiawar/pydastic"
+homepage = "https://github.com/ramiawar/pydastic"
 
 # Keywords description https://python-poetry.org/docs/pyproject/#keywords
 keywords = []  #! Update me
