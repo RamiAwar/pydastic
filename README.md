@@ -21,7 +21,7 @@ Pydastic is an elasticsearch python ORM based on Pydantic.
 
 ## 📈 Releases
 
-You can see the list of available releases on the [GitHub Releases](https://github.com/pydastic/pydastic/releases) page.
+You can see the list of available releases on the [GitHub Releases](https://github.com/ramiawar/pydastic/releases) page.
 
 We follow [Semantic Versions](https://semver.org/) specification.
 
@@ -29,9 +29,9 @@ We use [`Release Drafter`](https://github.com/marketplace/actions/release-drafte
 
 ## 🛡 License
 
-[![License](https://img.shields.io/github/license/pydastic/pydastic)](https://github.com/pydastic/pydastic/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/ramiawar/pydastic)](https://github.com/ramiawar/pydastic/blob/master/LICENSE)
 
-This project is licensed under the terms of the `MIT` license. See [LICENSE](https://github.com/pydastic/pydastic/blob/master/LICENSE) for more details.
+This project is licensed under the terms of the `MIT` license. See [LICENSE](https://github.com/ramiawar/pydastic/blob/master/LICENSE) for more details.
 
 ## 📃 Citation
 
