@@ -17,3 +17,7 @@ def get_version() -> str:
 
 
 version: str = get_version()
+
+from pydastic.model import ESModel
+
+__all__ = ["ESModel"]
