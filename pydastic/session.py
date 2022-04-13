@@ -1,6 +1,9 @@
 from typing import Any
-from elasticsearch import Elasticsearch, AsyncElasticsearch
+
+from elasticsearch import Elasticsearch
+
 from pydastic.model import ESModel
+
 
 class Session:
     def __init__(self, es: Elasticsearch):
@@ -15,7 +18,6 @@ class Session:
         """
         raise NotImplementedError
 
-    
     def update(self, model: ESModel):
         """Updates an already existing document in elasticsearch
         Raises an error if document does not exist
@@ -25,8 +27,6 @@ class Session:
         """
         raise NotImplementedError
 
-    
     def commit(self):
-        """Executes the accumulated operations and sends them as a bulk request to elasticsearch
-        """
+        """Executes the accumulated operations and sends them as a bulk request to elasticsearch"""
         raise NotImplementedError

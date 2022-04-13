@@ -11,14 +11,18 @@ from pydastic.error import InvalidElasticsearchResponse
 
 def test_model_definition_yields_error_without_meta_class():
     with pytest.raises(NotImplementedError):
+
         class User(ESModel):
             pass
 
+
 def test_model_definition_yields_error_without_index():
     with pytest.raises(NotImplementedError):
+
         class User(ESModel):
             class Meta:
                 pass
+
 
 def test_model_save(es: Elasticsearch):
     user = User(name="John")
@@ -32,16 +36,18 @@ def test_model_save(es: Elasticsearch):
     model = user.to_es()
     assert res["_source"] == model
 
+
 def test_model_save_with_index(es: Elasticsearch):
     preset_id = "sam@mail.com"
     user = User(id=preset_id, name="Sam")
     user.save(es, wait_for=True)
-    
+
     res = es.get(user.Meta.index, id=preset_id)
     assert res["found"]
 
     model = user.to_es()
     assert res["_source"] == model
+
 
 def test_model_save_datetime_saved_as_isoformat(es: Elasticsearch):
     date = datetime.now()
@@ -73,10 +79,7 @@ def test_model_from_es(es: Elasticsearch):
 
 
 def test_model_from_es_invalid_format():
-    res = {
-        "does not": "include _source",
-        "or": "_id"
-    }
+    res = {"does not": "include _source", "or": "_id"}
 
     with pytest.raises(InvalidElasticsearchResponse):
         User.from_es(res)
@@ -98,10 +101,7 @@ def test_model_get(es: Elasticsearch):
     get = User.get(es, id=user.id)
     assert get == user
 
+
 def test_model_get_nonexistent_raises_error(es: Elasticsearch):
     with pytest.raises(NotFoundError):
         User.get(es, id=uuid4())
-
-
-
-

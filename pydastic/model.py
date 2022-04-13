@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar, Union
 
@@ -10,7 +8,9 @@ from pydantic.main import Field, FieldInfo, ModelMetaclass
 
 from pydastic.error import InvalidElasticsearchResponse, NotFoundError
 
-_T = TypeVar('_T')
+_T = TypeVar("_T")
+
+
 def __dataclass_transform__(
     *,
     eq_default: bool = True,
@@ -20,6 +20,7 @@ def __dataclass_transform__(
 ) -> Callable[[_T], _T]:
     """Decorator to allow python language servers to autocomplete ESModel instances"""
     return lambda a: a
+
 
 @__dataclass_transform__(kw_only_default=True, field_descriptors=(Field, FieldInfo))
 class ESModelMeta(ModelMetaclass):
@@ -40,7 +41,9 @@ class ESModelMeta(ModelMetaclass):
 
         return base_model
 
+
 M = TypeVar("M", bound="ESModel")
+
 
 class ESModel(BaseModel, metaclass=ESModelMeta):
     id: Optional[Union[str, None]] = Field(default=None)
@@ -53,10 +56,8 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
 
     class Config:
         allow_population_by_field_name = True
-        json_encoders = {
-            datetime: lambda dt: dt.isoformat()
-        }
-    
+        json_encoders = {datetime: lambda dt: dt.isoformat()}
+
     def to_es(self: Type[M], **kwargs) -> Dict:
         """Generates an dictionary equivalent to what elasticsearch returns in the '_source' property of a response.
 
@@ -73,7 +74,7 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
             exclude.add("id")
 
         d = self.dict(exclude=exclude, exclude_unset=exclude_unset, **kwargs)
-        
+
         # Encode datetime fields
         for k, v in d.items():
             if isinstance(v, datetime):
@@ -102,7 +103,7 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
 
         if not source or not id:
             raise InvalidElasticsearchResponse
-        
+
         model = cls(**source)
         model.id = id
 
@@ -113,7 +114,7 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         If document already exists, existing document will be updated as per native elasticsearch index operation.
         If model instance includes an 'id' property, this will be used as the elasticsearch _id.
         If no 'id' is provided, then document will be indexed and elasticsearch will generate a suitable id that will be populated on the returned model.
-        
+
         Args:
             es (Elasticsearch): Elasticsearch client
             wait_for (bool, optional): Waits for all shards to sync before returning response - useful when writing tests. Defaults to False.
@@ -121,19 +122,19 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         doc = self.dict(exclude={"id"})
 
         # Allow waiting for shards - useful when testing
-        refresh = 'false'
+        refresh = "false"
         if wait_for:
-            refresh = 'wait_for'
+            refresh = "wait_for"
 
         res = es.index(index=self.Meta.index, body=doc, id=self.id, refresh=refresh)
         self.id = res.get("_id")
 
-
     # Class or static method? How to call cls if static?
+
     @classmethod
     def get(cls: Type[M], es: Elasticsearch, id: str) -> M:
         """Fetches document and returns ESModel instance populated with properties.
-        
+
         Args:
             es (Elasticsearch): Elasticsearch client
         """
@@ -141,9 +142,8 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
             res = es.get(cls.Meta.index, id=id)
         except ElasticNotFoundError:
             raise NotFoundError(f"document with id {id} not found")
-        
+
         model = cls.from_es(res)
         model.id = id
 
         return model
-

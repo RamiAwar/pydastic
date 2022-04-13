@@ -1,8 +1,10 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import Field
+
 from pydastic import ESModel
-from typing import Optional
+
 
 class User(ESModel):
     name: str
