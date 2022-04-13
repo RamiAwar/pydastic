@@ -61,6 +61,9 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
     def to_es(self: Type[M], **kwargs) -> Dict:
         """Generates an dictionary equivalent to what elasticsearch returns in the '_source' property of a response.
 
+        Args:
+            **kwargs: Pydantic .dict() options
+
         Returns:
             Dict
         """
@@ -109,7 +112,7 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
 
         return model
 
-    def save(self: Type[M], es: Elasticsearch, wait_for: bool = False):
+    def save(self: Type[M], es: Elasticsearch, wait_for: Optional[bool] = False):
         """Indexes document into elasticsearch.
         If document already exists, existing document will be updated as per native elasticsearch index operation.
         If model instance includes an 'id' property, this will be used as the elasticsearch _id.
@@ -137,6 +140,13 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
 
         Args:
             es (Elasticsearch): Elasticsearch client
+            id (str): Document id
+
+        Returns:
+            ESModel
+
+        Raises:
+            NotFoundError: Returned if document not found
         """
         try:
             res = es.get(cls.Meta.index, id=id)
