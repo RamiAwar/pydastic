@@ -1,9 +1,14 @@
-from typing import Any, Dict, Optional, Tuple, TypeVar, overload, Callable, Union
-from elasticsearch import Elasticsearch
-from pydantic import BaseModel
-from pydantic.main import ModelMetaclass
-from pydantic.main import Field, FieldInfo
+from __future__ import annotations
+
 from datetime import datetime
+from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar, Union
+
+from elasticsearch import Elasticsearch
+from elasticsearch import NotFoundError as ElasticNotFoundError
+from pydantic import BaseModel
+from pydantic.main import Field, FieldInfo, ModelMetaclass
+
+from pydastic.error import InvalidElasticsearchResponse, NotFoundError
 
 _T = TypeVar('_T')
 def __dataclass_transform__(
@@ -35,9 +40,9 @@ class ESModelMeta(ModelMetaclass):
 
         return base_model
 
+M = TypeVar("M", bound="ESModel")
 
 class ESModel(BaseModel, metaclass=ESModelMeta):
-
     id: Optional[Union[str, None]] = Field(default=None)
 
     class Meta:
@@ -52,30 +57,58 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
             datetime: lambda dt: dt.isoformat()
         }
     
-    def to_es(self, **kwargs) -> Dict:
+    def to_es(self: Type[M], **kwargs) -> Dict:
+        """Generates an dictionary equivalent to what elasticsearch returns in the '_source' property of a response.
+
+        Returns:
+            Dict
+        """
         exclude_unset = kwargs.pop(
             "exclude_unset",
             False,  # Set as false so that default values are also stored
         )
 
-        by_alias = kwargs.pop(
-            "by_alias", True
-        )  # whether field aliases should be used as keys in the returned dictionary
+        exclude: set = kwargs.pop("exclude", {"id"})
+        if "id" not in exclude:
+            exclude.add("id")
 
-        # Converting the model to a dictionnary
-        parsed = self.dict(by_alias=by_alias, exclude_unset=exclude_unset, **kwargs)
+        d = self.dict(exclude=exclude, exclude_unset=exclude_unset, **kwargs)
+        
+        # Encode datetime fields
+        for k, v in d.items():
+            if isinstance(v, datetime):
+                d[k] = v.isoformat()
 
-        return parsed
+        return d
 
     @classmethod
-    def from_es(cls, data: Dict[str, Any]):
+    def from_es(cls: Type[M], data: Dict[str, Any]) -> M:
+        """Returns an ESModel from an elasticsearch document that has _id, _source
+
+        Args:
+            data (Dict[str, Any]): elasticsearch document that has _id, _source
+
+        Raises:
+            InvalidElasticsearchResponse: raised if an invalid elasticsearch document format is provided
+
+        Returns:
+            ESModel
+        """
         if not data:
             return None
-        
-        # TODO: Handle extract source + id automatically
-        return cls(**data)
 
-    def save(self, es: Elasticsearch, wait_for: bool = False):
+        source = data.get("_source")
+        id = data.get("_id")
+
+        if not source or not id:
+            raise InvalidElasticsearchResponse
+        
+        model = cls(**source)
+        model.id = id
+
+        return model
+
+    def save(self: Type[M], es: Elasticsearch, wait_for: bool = False):
         """Indexes document into elasticsearch.
         If document already exists, existing document will be updated as per native elasticsearch index operation.
         If model instance includes an 'id' property, this will be used as the elasticsearch _id.
@@ -92,5 +125,25 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         if wait_for:
             refresh = 'wait_for'
 
-        res = es.index(index=123, body=doc, id=self.id, refresh=refresh)
+        res = es.index(index=self.Meta.index, body=doc, id=self.id, refresh=refresh)
         self.id = res.get("_id")
+
+
+    # Class or static method? How to call cls if static?
+    @classmethod
+    def get(cls: Type[M], es: Elasticsearch, id: str) -> M:
+        """Fetches document and returns ESModel instance populated with properties.
+        
+        Args:
+            es (Elasticsearch): Elasticsearch client
+        """
+        try:
+            res = es.get(cls.Meta.index, id=id)
+        except ElasticNotFoundError:
+            raise NotFoundError(f"document with id {id} not found")
+        
+        model = cls.from_es(res)
+        model.id = id
+
+        return model
+

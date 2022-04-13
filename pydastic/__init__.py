@@ -18,6 +18,7 @@ def get_version() -> str:
 
 version: str = get_version()
 
+from pydastic.error import NotFoundError
 from pydastic.model import ESModel
 
-__all__ = ["ESModel"]
+__all__ = ["ESModel", "NotFoundError"]
