@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 from uuid import uuid4
 
@@ -61,11 +62,48 @@ def test_model_save_datetime_saved_as_isoformat(es: Elasticsearch):
     assert res["_source"]["last_login"] == iso
 
 
-# TODO: Test save for updating documents
+def test_model_save_to_update(es: Elasticsearch, user: User):
+    # Update user details
+    user_copy = deepcopy(user)
 
-# TODO: Test save for adding field to a document
+    dummy_name = "xxxxx"
+    user.name = dummy_name
 
-# TODO: Test save for modifying existing field in a document
+    user.save(es, wait_for=True)
+    saved_user = User.get(es, id=user.id)
+
+    assert saved_user.name == user.name
+
+    # Change name back to compare with old object
+    saved_user.name = user_copy.name
+    assert saved_user == user_copy
+
+
+def test_model_save_additional_fields(es: Elasticsearch):
+    extra_fields = {"name": "John", "location": "Seattle", "manager_ids": ["Pam", "Sam"]}
+    res = es.index(User.Meta.index, body=extra_fields)
+
+    user = User.get(es, res["_id"], extra_fields=True)
+
+    # Confirm that user has these extra fields
+    assert user.location == extra_fields["location"]
+    assert user.manager_ids == extra_fields["manager_ids"]
+
+    # Check that extra fields dict is exact subset
+    user_dict = user.dict()
+    assert dict(user_dict, **extra_fields) == user_dict
+
+
+def test_model_ignores_additional_fields(es: Elasticsearch):
+    extra_fields = {"name": "John", "location": "Seattle", "manager_ids": ["Pam", "Sam"]}
+    res = es.index(User.Meta.index, body=extra_fields)
+
+    user = User.get(es, res["_id"])
+    with pytest.raises(AttributeError):
+        user.location
+
+    with pytest.raises(AttributeError):
+        user.manager_ids
 
 
 def test_model_from_es(es: Elasticsearch):
@@ -95,7 +133,7 @@ def test_model_to_es(es: Elasticsearch):
 
 
 def test_model_get(es: Elasticsearch):
-    user = User(name="Jean")
+    user = User(name="Jean", phone="128")
     user.save(es, wait_for=True)
 
     get = User.get(es, id=user.id)
@@ -105,3 +143,6 @@ def test_model_get(es: Elasticsearch):
 def test_model_get_nonexistent_raises_error(es: Elasticsearch):
     with pytest.raises(NotFoundError):
         User.get(es, id=uuid4())
+
+
+# TODO: Make sure Meta class updates only apply to a single instance

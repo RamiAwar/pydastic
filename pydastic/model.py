@@ -56,6 +56,7 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
 
     class Config:
         allow_population_by_field_name = True
+        extra = "allow"
         json_encoders = {datetime: lambda dt: dt.isoformat()}
 
     def to_es(self: Type[M], **kwargs) -> Dict:
@@ -132,15 +133,14 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         res = es.index(index=self.Meta.index, body=doc, id=self.id, refresh=refresh)
         self.id = res.get("_id")
 
-    # Class or static method? How to call cls if static?
-
     @classmethod
-    def get(cls: Type[M], es: Elasticsearch, id: str) -> M:
+    def get(cls: Type[M], es: Elasticsearch, id: str, extra_fields: Optional[bool] = False) -> M:
         """Fetches document and returns ESModel instance populated with properties.
 
         Args:
             es (Elasticsearch): Elasticsearch client
             id (str): Document id
+            extra_fields (bool, Optional): Include fields found in elasticsearch but not part of the model definition
 
         Returns:
             ESModel
@@ -148,8 +148,14 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         Raises:
             NotFoundError: Returned if document not found
         """
+        source_includes = None
+        if not extra_fields:
+            fields: dict = vars(cls).get("__fields__")
+            fields.pop("id", None)
+            source_includes = list(fields.keys())
+
         try:
-            res = es.get(cls.Meta.index, id=id)
+            res = es.get(cls.Meta.index, id=id, _source_includes=source_includes)
         except ElasticNotFoundError:
             raise NotFoundError(f"document with id {id} not found")
 

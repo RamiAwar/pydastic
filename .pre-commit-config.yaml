@@ -13,7 +13,16 @@ repos:
 
   - repo: local
     hooks:
+    - id: stylefix
+      name: stylefix
+      entry: |
+        make codestyle
+      language: system
+
+  - repo: local
+    hooks:
     - id: stylechecks
       name: stylechecks
-      entry: make check-codestyle
+      entry: |
+        make check-codestyle
       language: system
