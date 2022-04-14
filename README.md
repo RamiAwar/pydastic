@@ -1,7 +1,8 @@
-# Pydastic
-
 <div align="center">
-
+  
+<img src="https://github.com/RamiAwar/pydastic/raw/main/assets/images/pydastic.png" width="200" height="200" />
+<h1>Pydastic</h1>
+ 
 [![Build status](https://github.com/ramiawar/pydastic/workflows/build/badge.svg?branch=master&event=push)](https://github.com/ramiawar/pydastic/actions?query=workflow%3Abuild)
 [![Python Version](https://img.shields.io/pypi/pyversions/pydastic.svg)](https://pypi.org/project/pydastic/)
 [![Dependencies Status](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)](https://github.com/ramiawar/pydastic/pulls?utf8=%E2%9C%93&q=is%3Apr%20author%3Aapp%2Fdependabot)
