@@ -1,3 +1,4 @@
+from copy import copy
 from datetime import datetime
 from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar, Union
 
@@ -46,7 +47,7 @@ M = TypeVar("M", bound="ESModel")
 
 
 class ESModel(BaseModel, metaclass=ESModelMeta):
-    id: Optional[Union[str, None]] = Field(default=None)
+    id: Optional[str] = Field(default=None)
 
     class Meta:
         @property
@@ -150,7 +151,7 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         """
         source_includes = None
         if not extra_fields:
-            fields: dict = vars(cls).get("__fields__")
+            fields: dict = copy(vars(cls).get("__fields__"))
             fields.pop("id", None)
             source_includes = list(fields.keys())
 

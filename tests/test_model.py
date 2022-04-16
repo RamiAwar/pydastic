@@ -106,13 +106,21 @@ def test_model_ignores_additional_fields(es: Elasticsearch):
         user.manager_ids
 
 
+def test_pydantic_weirdness(es: Elasticsearch):
+    user = User(name="Alex")
+    user.save(es, wait_for=True)
+
+    assert "id" in User.__fields__
+
+
 def test_model_from_es(es: Elasticsearch):
     user = User(name="Alex")
     user.save(es, wait_for=True)
 
     res = es.get(user.Meta.index, id=user.id)
-    user_from_es = User.from_es(res)
+    assert res["found"]
 
+    user_from_es = User.from_es(res)
     assert user == user_from_es
 
 
