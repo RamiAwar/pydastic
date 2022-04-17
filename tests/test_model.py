@@ -123,6 +123,11 @@ def test_model_from_es(es: Elasticsearch):
     assert user == user_from_es
 
 
+def test_model_from_es_empty_data():
+    user = User.from_es({})
+    assert user is None
+
+
 def test_model_from_es_invalid_format():
     res = {"does not": "include _source", "or": "_id"}
 
@@ -137,6 +142,15 @@ def test_model_to_es(es: Elasticsearch):
 
     res = es.get(index=user.Meta.index, id=user.id)
     assert res["_source"] == es_from_user
+
+
+def test_model_to_es_with_exclude(es: Elasticsearch):
+    user = User(name="Carla")
+    user.save(es, wait_for=True)
+    es_from_user = user.to_es(exclude={"last_login", "phone"})
+
+    # Check that id excluded and fields excluded
+    assert es_from_user == {"name": "Carla"}
 
 
 def test_model_get(es: Elasticsearch):
