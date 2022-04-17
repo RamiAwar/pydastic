@@ -30,7 +30,7 @@ def test_model_save(es: Elasticsearch):
     user.save(es, wait_for=True)
     assert user.id != None
 
-    res = es.get(user.Meta.index, id=user.id)
+    res = es.get(index=user.Meta.index, id=user.id)
     assert res["found"]
 
     # Check that fields match exactly
@@ -43,7 +43,7 @@ def test_model_save_with_index(es: Elasticsearch):
     user = User(id=preset_id, name="Sam")
     user.save(es, wait_for=True)
 
-    res = es.get(user.Meta.index, id=preset_id)
+    res = es.get(index=user.Meta.index, id=preset_id)
     assert res["found"]
 
     model = user.to_es()
@@ -57,7 +57,7 @@ def test_model_save_datetime_saved_as_isoformat(es: Elasticsearch):
     user = User(name="Brandon", last_login=date)
     user.save(es, wait_for=True)
 
-    res = es.get(user.Meta.index, id=user.id)
+    res = es.get(index=user.Meta.index, id=user.id)
     assert res["found"]
     assert res["_source"]["last_login"] == iso
 
@@ -81,7 +81,7 @@ def test_model_save_to_update(es: Elasticsearch, user: User):
 
 def test_model_save_additional_fields(es: Elasticsearch):
     extra_fields = {"name": "John", "location": "Seattle", "manager_ids": ["Pam", "Sam"]}
-    res = es.index(User.Meta.index, body=extra_fields)
+    res = es.index(index=User.Meta.index, body=extra_fields)
 
     user = User.get(es, res["_id"], extra_fields=True)
 
@@ -96,7 +96,7 @@ def test_model_save_additional_fields(es: Elasticsearch):
 
 def test_model_ignores_additional_fields(es: Elasticsearch):
     extra_fields = {"name": "John", "location": "Seattle", "manager_ids": ["Pam", "Sam"]}
-    res = es.index(User.Meta.index, body=extra_fields)
+    res = es.index(index=User.Meta.index, body=extra_fields)
 
     user = User.get(es, res["_id"])
     with pytest.raises(AttributeError):
@@ -116,7 +116,7 @@ def test_model_from_es(es: Elasticsearch):
     user = User(name="Alex")
     user.save(es, wait_for=True)
 
-    res = es.get(user.Meta.index, id=user.id)
+    res = es.get(index=user.Meta.index, id=user.id)
     assert res["found"]
 
     user_from_es = User.from_es(res)
@@ -135,7 +135,7 @@ def test_model_to_es(es: Elasticsearch):
     user.save(es, wait_for=True)
     es_from_user = user.to_es()
 
-    res = es.get(user.Meta.index, id=user.id)
+    res = es.get(index=user.Meta.index, id=user.id)
     assert res["_source"] == es_from_user
 
 

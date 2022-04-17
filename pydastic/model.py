@@ -156,7 +156,7 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
             source_includes = list(fields.keys())
 
         try:
-            res = es.get(cls.Meta.index, id=id, _source_includes=source_includes)
+            res = es.get(index=cls.Meta.index, id=id, _source_includes=source_includes)
         except ElasticNotFoundError:
             raise NotFoundError(f"document with id {id} not found")
 
