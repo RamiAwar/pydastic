@@ -1,13 +1,17 @@
 <div align="center">
-  
+
 <img src="https://github.com/RamiAwar/pydastic/raw/main/assets/images/pydastic.png" width="200" height="200" />
 <h1>Pydastic</h1>
- 
+
+<a href="https://pypi.org/project/pydastic" target="_blank">
+    <img src="https://img.shields.io/pypi/v/pydastic?color=%2334D058&label=pypi%20package" alt="Package version">
+</a>
+
 [![build](https://github.com/RamiAwar/pydastic/actions/workflows/build.yml/badge.svg)](https://github.com/RamiAwar/pydastic/actions/workflows/build.yml)
 [![Python Version](https://img.shields.io/pypi/pyversions/pydastic.svg)](https://pypi.org/project/pydastic/)
 [![Dependencies Status](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)](https://github.com/ramiawar/pydastic/pulls?utf8=%E2%9C%93&q=is%3Apr%20author%3Aapp%2Fdependabot)
-
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 [![Security: bandit](https://img.shields.io/badge/security-bandit-green.svg)](https://github.com/PyCQA/bandit)
 [![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/ramiawar/pydastic/blob/master/.pre-commit-config.yaml)
 [![Semantic Versions](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--versions-e10079.svg)](https://github.com/ramiawar/pydastic/releases)
@@ -18,11 +22,26 @@ Pydastic is an elasticsearch python ORM based on Pydantic.
 
 </div>
 
+## 💾 Installation
+
+Pip:
+```bash
+pip install pydastic
+```
+
+Poetry:
+```bash
+poetry add pydastic
+```
+
+
 ## 🚀 Features
+- Simple CRUD operations supported
 
-Basic feature set still in development.
 
-### Definition
+## 📋 Usage
+
+### Defining Models
 ```python
 class User(ESModel):
     name: str
@@ -33,16 +52,21 @@ class User(ESModel):
         index = "user"
 ```
 
-### CRUD: Save
+### CRUD: Create, Update
 ```python
 es = Elasticsearch(hosts="localhost:9200")
 
+# Create and save doc
 user = User(name="John", age=20)
 user.save(es, wait_for=True)
 assert user.id != None
+
+# Update doc
+user.name = "Sam"
+user.save(es, wait_for=True)
 ```
 
-### CRUD: Get
+### Get Document
 ```python
 got = User.get(es, id=user.id)
 assert got == user
