@@ -5,7 +5,7 @@ from user import User
 
 @pytest.fixture()
 def es() -> Elasticsearch:
-    return Elasticsearch(ssl_show_warn=False)
+    return Elasticsearch(hosts="http://localhost:9200", ssl_show_warn=False)
 
 
 @pytest.fixture()
