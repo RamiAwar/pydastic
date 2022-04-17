@@ -106,10 +106,9 @@ def test_model_ignores_additional_fields(es: Elasticsearch):
         user.manager_ids
 
 
-def test_pydantic_weirdness(es: Elasticsearch):
-    user = User(name="Alex")
-    user.save(es, wait_for=True)
-
+def test_model_get_fields_unaffected(es: Elasticsearch, user: User):
+    """Bug where fields get overwritten when model is fetched and ID is popped out"""
+    User.get(es, id=user.id)
     assert "id" in User.__fields__
 
 
