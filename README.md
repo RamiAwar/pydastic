@@ -22,8 +22,8 @@ Pydastic is an elasticsearch python ORM based on Pydantic.
 
 Basic feature set still in development.
 
-```
-# Definition
+### Definition
+```python
 class User(ESModel):
     name: str
     phone: Optional[str]
@@ -31,12 +31,26 @@ class User(ESModel):
 
     class Meta:
         index = "user"
+```
 
-# Usage
+### CRUD: Save
+```python
+es = Elasticsearch(hosts="localhost:9200")
+
 user = User(name="John", age=20)
 user.save(es, wait_for=True)
 assert user.id != None
 ```
+
+### CRUD: Get
+```python
+got = User.get(es, id=user.id)
+assert got == user
+```
+
+### CRUD: Delete
+```Not yet implemented.```
+
 
 ## 📈 Releases
 
