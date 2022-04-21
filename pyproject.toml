@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pydastic"
-version = "0.1.0"
+version = "0.2.2"
 description = "Pydastic is an elasticsearch python ORM based on Pydantic."
 readme = "README.md"
 authors = ["pydastic <rami.awar.ra@gmail.com>"]

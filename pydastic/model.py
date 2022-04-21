@@ -164,3 +164,29 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         model.id = id
 
         return model
+
+    def delete(self: Type[M], es: Elasticsearch, wait_for: Optional[bool] = False):
+        """Deletes document from elasticsearch.
+
+        Args:
+            es (Elasticsearch): Elasticsearch client
+            wait_for (bool, optional): Waits for all shards to sync before returning response - useful when writing tests. Defaults to False.
+
+        Raises:
+            NotFoundError: Returned if document not found
+            ValueError: Returned when id attribute missing from instance
+        """
+        if not self.id:
+            raise ValueError("id missing from object")
+
+        doc = self.dict(exclude={"id"})
+
+        # Allow waiting for shards - useful when testing
+        refresh = "false"
+        if wait_for:
+            refresh = "wait_for"
+
+        try:
+            res = es.delete(index=self.Meta.index, id=self.id, refresh=refresh)
+        except ElasticNotFoundError:
+            raise NotFoundError(f"document with id {id} not found")

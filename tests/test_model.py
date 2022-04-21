@@ -166,4 +166,30 @@ def test_model_get_nonexistent_raises_error(es: Elasticsearch):
         User.get(es, id=uuid4())
 
 
-# TODO: Make sure Meta class updates only apply to a single instance
+def test_model_delete_raises_error(es: Elasticsearch):
+    user = User(name="James")
+
+    with pytest.raises(ValueError):
+        user.delete(es, wait_for=True)
+
+    with pytest.raises(NotFoundError):
+        user.id = "123456"
+        user.delete(es, wait_for=True)
+
+
+def test_model_delete(es: Elasticsearch):
+    user = User(name="Marie")
+    user.save(es, wait_for=True)
+    user.delete(es, wait_for=True)
+
+    with pytest.raises(NotFoundError):
+        User.get(es, id=user.id)
+
+
+def test_internal_meta_class_changes_limited_to_instance():
+    # Cannot modify Meta index to have a dynamic index name
+    user = User(name="a")
+    user.Meta.index = "dev-user"
+
+    assert User.Meta.index == "dev-user"
+    assert user.Meta.index == "dev-user"

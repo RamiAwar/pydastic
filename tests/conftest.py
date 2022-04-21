@@ -5,9 +5,6 @@ import pytest
 from elasticsearch import Elasticsearch
 from user import User
 
-# Enable backwards compatibility of es client 8.x.x with ES db 7.x.x
-os.environ["ELASTIC_CLIENT_APIVERSIONING"] = "1"
-
 
 @pytest.fixture()
 def es() -> Elasticsearch:
