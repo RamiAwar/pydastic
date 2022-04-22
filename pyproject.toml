@@ -36,6 +36,7 @@ python = "^3.7"
 elasticsearch = "^7.12.0"
 importlib_metadata = {version = "^4.5.0", python = "<3.8"}
 pydantic = "^1.9.0"
+elastic-transport = "^8.1.2"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7.1"
