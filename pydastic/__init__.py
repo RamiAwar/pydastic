@@ -20,5 +20,6 @@ version: str = get_version()
 
 from pydastic.error import NotFoundError
 from pydastic.model import ESModel
+from pydastic.pydastic import PydasticClient, connect
 
-__all__ = ["ESModel", "NotFoundError"]
+__all__ = ["ESModel", "NotFoundError", "PydasticClient", "connect"]

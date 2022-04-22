@@ -43,6 +43,8 @@ poetry add pydastic
 
 ### Defining Models
 ```python
+from pydastic import ESModel
+
 class User(ESModel):
     name: str
     phone: Optional[str]
@@ -54,26 +56,33 @@ class User(ESModel):
 
 ### CRUD: Create, Update
 ```python
-es = Elasticsearch(hosts="localhost:9200")
+from pydastic import connect
+
+connect(hosts="localhost:9200")
 
 # Create and save doc
 user = User(name="John", age=20)
-user.save(es, wait_for=True)
+user.save(wait_for=True)
 assert user.id != None
 
 # Update doc
 user.name = "Sam"
-user.save(es, wait_for=True)
+user.save(wait_for=True)
 ```
 
 ### Get Document
 ```python
-got = User.get(es, id=user.id)
+got = User.get(id=user.id)
 assert got == user
 ```
 
 ### CRUD: Delete
-```Not yet implemented.```
+```python
+user = User(name="Marie")
+user.save(wait_for=True)
+
+user.delete(wait_for=True)
+```
 
 
 ## 📈 Releases

@@ -27,7 +27,7 @@ def test_model_definition_yields_error_without_index():
 
 def test_model_save(es: Elasticsearch):
     user = User(name="John")
-    user.save(es, wait_for=True)
+    user.save(wait_for=True)
     assert user.id != None
 
     res = es.get(index=user.Meta.index, id=user.id)
@@ -41,7 +41,7 @@ def test_model_save(es: Elasticsearch):
 def test_model_save_with_index(es: Elasticsearch):
     preset_id = "sam@mail.com"
     user = User(id=preset_id, name="Sam")
-    user.save(es, wait_for=True)
+    user.save(wait_for=True)
 
     res = es.get(index=user.Meta.index, id=preset_id)
     assert res["found"]
@@ -55,7 +55,7 @@ def test_model_save_datetime_saved_as_isoformat(es: Elasticsearch):
     iso = date.isoformat()
 
     user = User(name="Brandon", last_login=date)
-    user.save(es, wait_for=True)
+    user.save(wait_for=True)
 
     res = es.get(index=user.Meta.index, id=user.id)
     assert res["found"]
@@ -69,8 +69,8 @@ def test_model_save_to_update(es: Elasticsearch, user: User):
     dummy_name = "xxxxx"
     user.name = dummy_name
 
-    user.save(es, wait_for=True)
-    saved_user = User.get(es, id=user.id)
+    user.save(wait_for=True)
+    saved_user = User.get(id=user.id)
 
     assert saved_user.name == user.name
 
@@ -83,7 +83,7 @@ def test_model_save_additional_fields(es: Elasticsearch):
     extra_fields = {"name": "John", "location": "Seattle", "manager_ids": ["Pam", "Sam"]}
     res = es.index(index=User.Meta.index, body=extra_fields)
 
-    user = User.get(es, res["_id"], extra_fields=True)
+    user = User.get(res["_id"], extra_fields=True)
 
     # Confirm that user has these extra fields
     assert user.location == extra_fields["location"]
@@ -98,7 +98,7 @@ def test_model_ignores_additional_fields(es: Elasticsearch):
     extra_fields = {"name": "John", "location": "Seattle", "manager_ids": ["Pam", "Sam"]}
     res = es.index(index=User.Meta.index, body=extra_fields)
 
-    user = User.get(es, res["_id"])
+    user = User.get(res["_id"])
     with pytest.raises(AttributeError):
         user.location
 
@@ -108,13 +108,13 @@ def test_model_ignores_additional_fields(es: Elasticsearch):
 
 def test_model_get_fields_unaffected(es: Elasticsearch, user: User):
     """Bug where fields get overwritten when model is fetched and ID is popped out"""
-    User.get(es, id=user.id)
+    User.get(id=user.id)
     assert "id" in User.__fields__
 
 
 def test_model_from_es(es: Elasticsearch):
     user = User(name="Alex")
-    user.save(es, wait_for=True)
+    user.save(wait_for=True)
 
     res = es.get(index=user.Meta.index, id=user.id)
     assert res["found"]
@@ -137,7 +137,7 @@ def test_model_from_es_invalid_format():
 
 def test_model_to_es(es: Elasticsearch):
     user = User(name="Claude")
-    user.save(es, wait_for=True)
+    user.save(wait_for=True)
     es_from_user = user.to_es()
 
     res = es.get(index=user.Meta.index, id=user.id)
@@ -146,7 +146,7 @@ def test_model_to_es(es: Elasticsearch):
 
 def test_model_to_es_with_exclude(es: Elasticsearch):
     user = User(name="Carla")
-    user.save(es, wait_for=True)
+    user.save(wait_for=True)
     es_from_user = user.to_es(exclude={"last_login", "phone"})
 
     # Check that id excluded and fields excluded
@@ -155,35 +155,35 @@ def test_model_to_es_with_exclude(es: Elasticsearch):
 
 def test_model_get(es: Elasticsearch):
     user = User(name="Jean", phone="128")
-    user.save(es, wait_for=True)
+    user.save(wait_for=True)
 
-    get = User.get(es, id=user.id)
+    get = User.get(id=user.id)
     assert get == user
 
 
 def test_model_get_nonexistent_raises_error(es: Elasticsearch):
     with pytest.raises(NotFoundError):
-        User.get(es, id=uuid4())
+        User.get(id=uuid4())
 
 
 def test_model_delete_raises_error(es: Elasticsearch):
     user = User(name="James")
 
     with pytest.raises(ValueError):
-        user.delete(es, wait_for=True)
+        user.delete(wait_for=True)
 
     with pytest.raises(NotFoundError):
         user.id = "123456"
-        user.delete(es, wait_for=True)
+        user.delete(wait_for=True)
 
 
 def test_model_delete(es: Elasticsearch):
     user = User(name="Marie")
-    user.save(es, wait_for=True)
-    user.delete(es, wait_for=True)
+    user.save(wait_for=True)
+    user.delete(wait_for=True)
 
     with pytest.raises(NotFoundError):
-        User.get(es, id=user.id)
+        User.get(id=user.id)
 
 
 def test_internal_meta_class_changes_limited_to_instance():
