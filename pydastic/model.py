@@ -2,12 +2,12 @@ from copy import copy
 from datetime import datetime
 from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar, Union
 
-from elasticsearch import Elasticsearch
 from elasticsearch import NotFoundError as ElasticNotFoundError
 from pydantic import BaseModel
 from pydantic.main import Field, FieldInfo, ModelMetaclass
 
 from pydastic.error import InvalidElasticsearchResponse, NotFoundError
+from pydastic.pydastic import _client
 
 _T = TypeVar("_T")
 
@@ -114,14 +114,13 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
 
         return model
 
-    def save(self: Type[M], es: Elasticsearch, wait_for: Optional[bool] = False):
+    def save(self: Type[M], wait_for: Optional[bool] = False):
         """Indexes document into elasticsearch.
         If document already exists, existing document will be updated as per native elasticsearch index operation.
         If model instance includes an 'id' property, this will be used as the elasticsearch _id.
         If no 'id' is provided, then document will be indexed and elasticsearch will generate a suitable id that will be populated on the returned model.
 
         Args:
-            es (Elasticsearch): Elasticsearch client
             wait_for (bool, optional): Waits for all shards to sync before returning response - useful when writing tests. Defaults to False.
         """
         doc = self.dict(exclude={"id"})
@@ -131,15 +130,14 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         if wait_for:
             refresh = "wait_for"
 
-        res = es.index(index=self.Meta.index, body=doc, id=self.id, refresh=refresh)
+        res = _client.client.index(index=self.Meta.index, body=doc, id=self.id, refresh=refresh)
         self.id = res.get("_id")
 
     @classmethod
-    def get(cls: Type[M], es: Elasticsearch, id: str, extra_fields: Optional[bool] = False) -> M:
+    def get(cls: Type[M], id: str, extra_fields: Optional[bool] = False) -> M:
         """Fetches document and returns ESModel instance populated with properties.
 
         Args:
-            es (Elasticsearch): Elasticsearch client
             id (str): Document id
             extra_fields (bool, Optional): Include fields found in elasticsearch but not part of the model definition
 
@@ -156,7 +154,7 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
             source_includes = list(fields.keys())
 
         try:
-            res = es.get(index=cls.Meta.index, id=id, _source_includes=source_includes)
+            res = _client.client.get(index=cls.Meta.index, id=id, _source_includes=source_includes)
         except ElasticNotFoundError:
             raise NotFoundError(f"document with id {id} not found")
 
@@ -165,11 +163,10 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
 
         return model
 
-    def delete(self: Type[M], es: Elasticsearch, wait_for: Optional[bool] = False):
+    def delete(self: Type[M], wait_for: Optional[bool] = False):
         """Deletes document from elasticsearch.
 
         Args:
-            es (Elasticsearch): Elasticsearch client
             wait_for (bool, optional): Waits for all shards to sync before returning response - useful when writing tests. Defaults to False.
 
         Raises:
@@ -187,6 +184,6 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
             refresh = "wait_for"
 
         try:
-            res = es.delete(index=self.Meta.index, id=self.id, refresh=refresh)
+            res = _client.client.delete(index=self.Meta.index, id=self.id, refresh=refresh)
         except ElasticNotFoundError:
             raise NotFoundError(f"document with id {id} not found")

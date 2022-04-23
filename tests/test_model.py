@@ -25,6 +25,12 @@ def test_model_definition_yields_error_without_index():
                 pass
 
 
+def test_model_save_without_connection_raises_attribute_error():
+    with pytest.raises(AttributeError):
+        user = User(name="Liam")
+        user.save(wait_for=True)
+
+
 def test_model_save(es: Elasticsearch):
     user = User(name="John")
     user.save(wait_for=True)

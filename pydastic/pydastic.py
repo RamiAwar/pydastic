@@ -10,23 +10,29 @@ from elastic_transport import (
 )
 from elastic_transport.client_utils import DEFAULT, DefaultType
 from elasticsearch import Elasticsearch
-from elasticsearch.utils import _TYPE_HOSTS
+from elasticsearch._sync.client.utils import _TYPE_HOSTS
 
 
 class PydasticClient:
-    client: Elasticsearch
+    client: Elasticsearch = None
+
+    def __getattribute__(self, __name: str) -> t.Any:
+        if __name == "client" and object.__getattribute__(self, __name) is None:
+            raise AttributeError("client not initialized - make sure to call Pydastic.connect()")
+        return object.__getattribute__(self, __name)
+
+
+_client = PydasticClient()
 
 
 def connect(
     hosts: t.Optional[_TYPE_HOSTS] = None,
     *,
-    # API
     cloud_id: t.Optional[str] = None,
     api_key: t.Optional[t.Union[str, t.Tuple[str, str]]] = None,
     basic_auth: t.Optional[t.Union[str, t.Tuple[str, str]]] = None,
     bearer_auth: t.Optional[str] = None,
     opaque_id: t.Optional[str] = None,
-    # Node
     headers: t.Union[DefaultType, t.Mapping[str, str]] = DEFAULT,
     connections_per_node: t.Union[DefaultType, int] = DEFAULT,
     http_compress: t.Union[DefaultType, bool] = DEFAULT,
@@ -39,7 +45,6 @@ def connect(
     ssl_version: t.Union[DefaultType, int] = DEFAULT,
     ssl_context: t.Union[DefaultType, t.Any] = DEFAULT,
     ssl_show_warn: t.Union[DefaultType, bool] = DEFAULT,
-    # Transport
     transport_class: t.Type[Transport] = Transport,
     request_timeout: t.Union[DefaultType, None, float] = DEFAULT,
     node_class: t.Union[DefaultType, t.Type[BaseNode]] = DEFAULT,
@@ -74,55 +79,51 @@ def connect(
     http_auth: t.Union[DefaultType, t.Any] = DEFAULT,
     maxsize: t.Union[DefaultType, int] = DEFAULT,
 ):
-
-    PydasticClient.client = Elasticsearch(
-        hosts,
-        # API
-        cloud_id,
-        api_key,
-        basic_auth,
-        bearer_auth,
-        opaque_id,
-        # Node
-        headers,
-        connections_per_node,
-        http_compress,
-        verify_certs,
-        ca_certs,
-        client_cert,
-        client_key,
-        ssl_assert_hostname,
-        ssl_assert_fingerprint,
-        ssl_version,
-        ssl_context,
-        ssl_show_warn,
-        # Transport
-        transport_class,
-        request_timeout,
-        node_class,
-        node_pool_class,
-        randomize_nodes_in_pool,
-        node_selector_class,
-        dead_node_backoff_factor,
-        max_dead_node_backoff,
-        serializer,
-        serializers,
-        default_mimetype,
-        max_retries,
-        retry_on_status,
-        retry_on_timeout,
-        sniff_on_start,
-        sniff_before_requests,
-        sniff_on_node_failure,
-        sniff_timeout,
-        min_delay_between_sniffing,
-        sniffed_node_callback,
-        meta_header,
-        timeout,
-        randomize_hosts,
-        host_info_callback,
-        sniffer_timeout,
-        sniff_on_connection_fail,
-        http_auth,
-        maxsize,
+    _client.client = Elasticsearch(
+        hosts=hosts,
+        cloud_id=cloud_id,
+        api_key=api_key,
+        basic_auth=basic_auth,
+        bearer_auth=bearer_auth,
+        opaque_id=opaque_id,
+        headers=headers,
+        connections_per_node=connections_per_node,
+        http_compress=http_compress,
+        verify_certs=verify_certs,
+        ca_certs=ca_certs,
+        client_cert=client_cert,
+        client_key=client_key,
+        ssl_assert_hostname=ssl_assert_hostname,
+        ssl_assert_fingerprint=ssl_assert_fingerprint,
+        ssl_version=ssl_version,
+        ssl_context=ssl_context,
+        ssl_show_warn=ssl_show_warn,
+        transport_class=transport_class,
+        request_timeout=request_timeout,
+        node_class=node_class,
+        node_pool_class=node_pool_class,
+        randomize_nodes_in_pool=randomize_nodes_in_pool,
+        node_selector_class=node_selector_class,
+        dead_node_backoff_factor=dead_node_backoff_factor,
+        max_dead_node_backoff=max_dead_node_backoff,
+        serializer=serializer,
+        serializers=serializers,
+        default_mimetype=default_mimetype,
+        max_retries=max_retries,
+        retry_on_status=retry_on_status,
+        retry_on_timeout=retry_on_timeout,
+        sniff_on_start=sniff_on_start,
+        sniff_before_requests=sniff_before_requests,
+        sniff_on_node_failure=sniff_on_node_failure,
+        sniff_timeout=sniff_timeout,
+        min_delay_between_sniffing=min_delay_between_sniffing,
+        sniffed_node_callback=sniffed_node_callback,
+        meta_header=meta_header,
+        timeout=timeout,
+        randomize_hosts=randomize_hosts,
+        host_info_callback=host_info_callback,
+        sniffer_timeout=sniffer_timeout,
+        sniff_on_connection_fail=sniff_on_connection_fail,
+        http_auth=http_auth,
+        maxsize=maxsize,
     )
