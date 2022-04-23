@@ -37,6 +37,7 @@ poetry add pydastic
 
 ## 🚀 Features
 - Simple CRUD operations supported
+- Dynamic index support when committing operation
 
 
 ## 📋 Usage
@@ -70,7 +71,7 @@ user.name = "Sam"
 user.save(wait_for=True)
 ```
 
-### Get Document
+### CRUD: Read Document
 ```python
 got = User.get(id=user.id)
 assert got == user
@@ -84,6 +85,10 @@ user.save(wait_for=True)
 user.delete(wait_for=True)
 ```
 
+## Support Elasticsearch Versions
+
+Part of the build flow is running the tests using elasticsearch 7.12.0 DB as well as python client, and using 8.1.2 as well (DB as well as client, as part of a build matrix).
+This ensures support for multiple versions.
 
 ## 📈 Releases
 
