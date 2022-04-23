@@ -114,13 +114,14 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
 
         return model
 
-    def save(self: Type[M], wait_for: Optional[bool] = False):
+    def save(self: Type[M], index: Optional[str] = None, wait_for: Optional[bool] = False):
         """Indexes document into elasticsearch.
         If document already exists, existing document will be updated as per native elasticsearch index operation.
         If model instance includes an 'id' property, this will be used as the elasticsearch _id.
         If no 'id' is provided, then document will be indexed and elasticsearch will generate a suitable id that will be populated on the returned model.
 
         Args:
+            index (str, optional): Index name
             wait_for (bool, optional): Waits for all shards to sync before returning response - useful when writing tests. Defaults to False.
         """
         doc = self.dict(exclude={"id"})
@@ -130,16 +131,21 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         if wait_for:
             refresh = "wait_for"
 
-        res = _client.client.index(index=self.Meta.index, body=doc, id=self.id, refresh=refresh)
+        # Use user-provided index if provided (dynamic index support)
+        if not index:
+            index = self.Meta.index
+
+        res = _client.client.index(index=index, body=doc, id=self.id, refresh=refresh)
         self.id = res.get("_id")
 
     @classmethod
-    def get(cls: Type[M], id: str, extra_fields: Optional[bool] = False) -> M:
+    def get(cls: Type[M], id: str, extra_fields: Optional[bool] = False, index: Optional[str] = None) -> M:
         """Fetches document and returns ESModel instance populated with properties.
 
         Args:
             id (str): Document id
             extra_fields (bool, Optional): Include fields found in elasticsearch but not part of the model definition
+            index (str, optional): Index name
 
         Returns:
             ESModel
@@ -153,8 +159,12 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
             fields.pop("id", None)
             source_includes = list(fields.keys())
 
+        # Use user-provided index if provided (dynamic index support)
+        if not index:
+            index = cls.Meta.index
+
         try:
-            res = _client.client.get(index=cls.Meta.index, id=id, _source_includes=source_includes)
+            res = _client.client.get(index=index, id=id, _source_includes=source_includes)
         except ElasticNotFoundError:
             raise NotFoundError(f"document with id {id} not found")
 
@@ -163,10 +173,11 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
 
         return model
 
-    def delete(self: Type[M], wait_for: Optional[bool] = False):
+    def delete(self: Type[M], index: Optional[str] = None, wait_for: Optional[bool] = False):
         """Deletes document from elasticsearch.
 
         Args:
+            index (str, optional): Index name
             wait_for (bool, optional): Waits for all shards to sync before returning response - useful when writing tests. Defaults to False.
 
         Raises:
@@ -183,7 +194,11 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         if wait_for:
             refresh = "wait_for"
 
+        # Use user-provided index if provided (dynamic index support)
+        if not index:
+            index = self.Meta.index
+
         try:
-            res = _client.client.delete(index=self.Meta.index, id=self.id, refresh=refresh)
+            res = _client.client.delete(index=index, id=self.id, refresh=refresh)
         except ElasticNotFoundError:
             raise NotFoundError(f"document with id {id} not found")

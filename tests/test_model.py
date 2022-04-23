@@ -56,6 +56,18 @@ def test_model_save_with_index(es: Elasticsearch):
     assert res["_source"] == model
 
 
+def test_model_save_with_dynamic_index(es: Elasticsearch):
+    preset_id = "abc@mail.com"
+    user = User(id=preset_id, name="Sam")
+    user.save(index="custom-user", wait_for=True)
+
+    res = es.get(index="custom-user", id=preset_id)
+    assert res["found"]
+
+    model = user.to_es()
+    assert res["_source"] == model
+
+
 def test_model_save_datetime_saved_as_isoformat(es: Elasticsearch):
     date = datetime.now()
     iso = date.isoformat()
@@ -167,6 +179,14 @@ def test_model_get(es: Elasticsearch):
     assert get == user
 
 
+def test_model_get_with_dynamic_index(es: Elasticsearch):
+    user = User(name="Philip", phone="128")
+    user.save(index="custom", wait_for=True)
+
+    get = User.get(index="custom", id=user.id)
+    assert get == user
+
+
 def test_model_get_nonexistent_raises_error(es: Elasticsearch):
     with pytest.raises(NotFoundError):
         User.get(id=uuid4())
@@ -190,6 +210,15 @@ def test_model_delete(es: Elasticsearch):
 
     with pytest.raises(NotFoundError):
         User.get(id=user.id)
+
+
+def test_model_delete_with_dynamic_index(es: Elasticsearch):
+    user = User(name="Marie")
+    user.save(index="abc", wait_for=True)
+    user.delete(index="abc", wait_for=True)
+
+    with pytest.raises(NotFoundError):
+        User.get(id=user.id, index="abc")
 
 
 def test_internal_meta_class_changes_limited_to_instance():
