@@ -192,21 +192,6 @@ toml = "*"
 pipenv = ["pipenv"]
 
 [[package]]
-name = "elastic-transport"
-version = "8.1.2"
-description = "Transport classes and utilities shared among Python Elastic client libraries"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-certifi = "*"
-urllib3 = ">=1.26.2,<2"
-
-[package.extras]
-develop = ["pytest", "pytest-cov", "pytest-mock", "pytest-asyncio", "pytest-httpserver", "trustme", "mock", "requests", "aiohttp"]
-
-[[package]]
 name = "elasticsearch"
 version = "7.17.2"
 description = "Python client for Elasticsearch"
@@ -753,7 +738,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "d9f9a7061901f88be95aa3dfa17160984b7e450f52755893dd6900de57e9002c"
+content-hash = "c9f8f346cf792dd6bf764e8a6deeedb3f2dc446d0d4a9761196185cbe85e7dec"
 
 [metadata.files]
 astroid = [
@@ -879,10 +864,6 @@ distlib = [
 dparse = [
     {file = "dparse-0.5.1-py3-none-any.whl", hash = "sha256:e953a25e44ebb60a5c6efc2add4420c177f1d8404509da88da9729202f306994"},
     {file = "dparse-0.5.1.tar.gz", hash = "sha256:a1b5f169102e1c894f9a7d5ccf6f9402a836a5d24be80a986c7ce9eaed78f367"},
-]
-elastic-transport = [
-    {file = "elastic-transport-8.1.2.tar.gz", hash = "sha256:869f7d668fb7738776639053fc87499caacbd1bdc7819f0de8025ac0e6cb29ce"},
-    {file = "elastic_transport-8.1.2-py3-none-any.whl", hash = "sha256:10914d0c5c268d9dcfee02cfbef861382d098309ba4eedab820062841bd214b3"},
 ]
 elasticsearch = [
     {file = "elasticsearch-7.17.2-py2.py3-none-any.whl", hash = "sha256:f49ebaf9e9652a468db4dce5eb8a6a7ea33594ab988f6dadebf36f99772ac809"},
