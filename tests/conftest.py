@@ -1,6 +1,3 @@
-import os
-import sys
-
 import pytest
 from elasticsearch import Elasticsearch
 from user import User
@@ -15,7 +12,7 @@ def es() -> Elasticsearch:
 
 
 @pytest.fixture()
-def user(es) -> User:
+def user(es: Elasticsearch) -> User:
     user = User(name="John", phone="123456")
     user.save(wait_for=True)
     return user

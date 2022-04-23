@@ -11,6 +11,10 @@ class PydasticClient:
             raise AttributeError("client not initialized - make sure to call Pydastic.connect()")
         return object.__getattribute__(self, __name)
 
+    def _set_client(self, client: Elasticsearch):
+        object.__setattr__(self, "client", client)
+        return client
+
 
 _client = PydasticClient()
 
@@ -18,13 +22,16 @@ F = t.TypeVar("F", bound=t.Callable[..., t.Any])
 
 
 class copy_signature(t.Generic[F]):
-    def __init__(self, target: F) -> None:
-        ...
+    def __init__(self, target: F) -> F:
+        self._target = target
 
     def __call__(self, wrapped: t.Callable[..., t.Any]) -> F:
-        ...
+        def wrapped(*args, **kwargs):
+            return _client._set_client(self._target(*args, **kwargs))
+
+        return wrapped
 
 
 @copy_signature(Elasticsearch)
 def connect(*args, **kwargs):
-    return Elasticsearch(*args, **kwargs)
+    ...
