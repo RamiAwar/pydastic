@@ -193,7 +193,7 @@ pipenv = ["pipenv"]
 
 [[package]]
 name = "elasticsearch"
-version = "7.17.2"
+version = "7.12.0"
 description = "Python client for Elasticsearch"
 category = "main"
 optional = false
@@ -738,7 +738,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "c9f8f346cf792dd6bf764e8a6deeedb3f2dc446d0d4a9761196185cbe85e7dec"
+content-hash = "1a4b6256ad96d01559d1534ae0011e29061587c5b2a7d8c619f42339591ad12a"
 
 [metadata.files]
 astroid = [
@@ -866,8 +866,8 @@ dparse = [
     {file = "dparse-0.5.1.tar.gz", hash = "sha256:a1b5f169102e1c894f9a7d5ccf6f9402a836a5d24be80a986c7ce9eaed78f367"},
 ]
 elasticsearch = [
-    {file = "elasticsearch-7.17.2-py2.py3-none-any.whl", hash = "sha256:f49ebaf9e9652a468db4dce5eb8a6a7ea33594ab988f6dadebf36f99772ac809"},
-    {file = "elasticsearch-7.17.2.tar.gz", hash = "sha256:1b1fa86cbfab39bf43dce1f76f737fc59d5a8e792e2a721e0b4437db44da5647"},
+    {file = "elasticsearch-7.12.0-py2.py3-none-any.whl", hash = "sha256:c67b0f6541eda6de9f92eaea319c070aa2710c5d4d4ee5e3dfa3c21bd95aa378"},
+    {file = "elasticsearch-7.12.0.tar.gz", hash = "sha256:9a77172be02bc4855210d83f0f1346a1e7d421e3cb2ca47ba81ac0c5a717b3a0"},
 ]
 filelock = [
     {file = "filelock-3.6.0-py3-none-any.whl", hash = "sha256:f8314284bfffbdcfa0ff3d7992b023d4c628ced6feb957351d4c48d059f56bc0"},
