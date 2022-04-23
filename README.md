@@ -55,12 +55,18 @@ class User(ESModel):
         index = "user"
 ```
 
-### CRUD: Create, Update
+### Establishing Connection
+An elasticsearch connection can be setup by using the `connect` function. This function adopts the same signature as the `elasticsearch.Elasticsearch` client and supports editor autocomplete.
+Make sure to call this only once. No protection is put in place against multiple calls, might affect performance negatively.
+
 ```python
 from pydastic import connect
 
 connect(hosts="localhost:9200")
+```
 
+### CRUD: Create, Update
+```python
 # Create and save doc
 user = User(name="John", age=20)
 user.save(wait_for=True)
@@ -83,6 +89,17 @@ user = User(name="Marie")
 user.save(wait_for=True)
 
 user.delete(wait_for=True)
+```
+
+### Dynamic Index Support
+Pydastic also supports dynamic index specification. The model Metaclass index definition is still mandatory, but if an index is specified when performing operations, that will be used instead.
+The model Metaclass index is technically a fallback, although most users will probably be using a single index per model. For some users, multiple indices per model are needed (for example one user index per company).
+
+```python
+user = User(name="Marie")
+user.save(index="my-user", wait_for=True)
+
+user.delete(index="my-user", wait_for=True)
 ```
 
 ## Support Elasticsearch Versions
