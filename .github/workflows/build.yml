@@ -45,7 +45,6 @@ jobs:
     
     - name: Upgrade es client
       run: poetry add elasticsearch=${{ matrix.es-version }}
-      if: ${{ matrix.es-version == '8.1.2' }}
 
     - name: Run style checks
       run: |
