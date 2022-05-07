@@ -7,7 +7,8 @@ from pydastic.pydastic import _client, connect
 
 @pytest.fixture()
 def es() -> Elasticsearch:
-    connect(hosts="http://localhost:9200", ssl_show_warn=False)
+    connect(hosts="http://localhost:9200")
+    _client.client.delete_by_query(index="_all", body={"query": {"match_all": {}}}, wait_for_completion=True, refresh=True)
     return _client.client
 
 

@@ -3,8 +3,9 @@ from datetime import datetime
 from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar, Union
 
 from elasticsearch import NotFoundError as ElasticNotFoundError
-from pydantic import BaseModel
-from pydantic.main import Field, FieldInfo, ModelMetaclass
+from pydantic import BaseModel, Field
+from pydantic.fields import FieldInfo
+from pydantic.main import ModelMetaclass
 
 from pydastic.error import InvalidElasticsearchResponse, NotFoundError
 from pydastic.pydastic import _client
@@ -187,8 +188,6 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         if not self.id:
             raise ValueError("id missing from object")
 
-        doc = self.dict(exclude={"id"})
-
         # Allow waiting for shards - useful when testing
         refresh = "false"
         if wait_for:
@@ -199,6 +198,6 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
             index = self.Meta.index
 
         try:
-            res = _client.client.delete(index=index, id=self.id, refresh=refresh)
+            _client.client.delete(index=index, id=self.id, refresh=refresh)
         except ElasticNotFoundError:
             raise NotFoundError(f"document with id {id} not found")
