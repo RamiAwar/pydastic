@@ -95,7 +95,7 @@ user.delete(wait_for=True)
 ### Sessions
 Sessions are inspired by [SQL Alchemy](https://docs.sqlalchemy.org/en/14/orm/tutorial.html)'s sessions, and are used for simplifying bulk operations using the Elasticsearch client. From what I've seen, the ES client makes it pretty hard to use the bulk API, so they created bulk helpers (which in turn have incomplete/wrong docs).
 
-With an ORM, bulk operations can be exposed neatly through a simple API.
+
 ```python
 john = User(name="John")
 sarah = User(name="Sarah")
@@ -105,6 +105,45 @@ session = Session()
 session.save(john)
 session.save(sarah)
 session.commit()
+```
+
+With an ORM, bulk operations can be exposed neatly through a simple API. Pydastic also offers more informative errors on issues encountered during bulk operations. This is possible by suppressing the built-in elastic client errors and extracting more verbose ones instead.
+
+Example error:
+
+```json
+pydastic.error.BulkError: [
+    {
+        "update": {
+            "_index": "user",
+            "_type": "_doc",
+            "_id": "test",
+            "status": 404,
+            "error": {
+                "type": "document_missing_exception",
+                "reason": "[_doc][test]: document missing",
+                "index_uuid": "cKD0254aQRWF-E2TMxHa4Q",
+                "shard": "0",
+                "index": "user"
+            }
+        }
+    },
+    {
+        "update": {
+            "_index": "user",
+            "_type": "_doc",
+            "_id": "test2",
+            "status": 404,
+            "error": {
+                "type": "document_missing_exception",
+                "reason": "[_doc][test2]: document missing",
+                "index_uuid": "cKD0254aQRWF-E2TMxHa4Q",
+                "shard": "0",
+                "index": "user"
+            }
+        }
+    }
+]
 ```
 
 The sessions API will also be available through a context manager before the v1.0 release.

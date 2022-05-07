@@ -62,7 +62,7 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         json_encoders = {datetime: lambda dt: dt.isoformat()}
 
     def to_es(self: Type[M], **kwargs) -> Dict:
-        """Generates an dictionary equivalent to what elasticsearch returns in the '_source' property of a response.
+        """Generates an dictionary equivalent to what elasticsearch returns in the '_source' property of a response. This excludes the id property.
 
         Args:
             **kwargs: Pydantic .dict() options
