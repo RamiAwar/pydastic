@@ -13,6 +13,12 @@ class Session:
         # Initialize state
         self._operations = []
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        ...
+
     def save(self, model: ESModel, index: Optional[str] = None):
         """Save bulk operation
 
