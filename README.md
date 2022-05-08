@@ -101,11 +101,10 @@ Sessions are inspired by [SQL Alchemy](https://docs.sqlalchemy.org/en/14/orm/tut
 john = User(name="John")
 sarah = User(name="Sarah")
 
-session = Session()
-
-session.save(john)
-session.save(sarah)
-session.commit()
+with Session() as session:
+    session.save(john)
+    session.save(sarah)
+    session.commit()
 ```
 
 With an ORM, bulk operations can be exposed neatly through a simple API. Pydastic also offers more informative errors on issues encountered during bulk operations. This is possible by suppressing the built-in elastic client errors and extracting more verbose ones instead.
