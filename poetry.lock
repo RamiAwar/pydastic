@@ -570,7 +570,7 @@ pytest = ">=7.1.1,<8.0.0"
 
 [[package]]
 name = "pyupgrade"
-version = "2.32.0"
+version = "2.32.1"
 description = "A tool to automatically upgrade syntax for newer versions."
 category = "dev"
 optional = false
@@ -750,7 +750,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "a5fb656578c2e85a831cd563cf810240df734723353702555416a93a77a9bb4f"
+content-hash = "b6abfa16cf652413475c2c1801f72a94190eaab7757d0ac43df2fe8ae13205e5"
 
 [metadata.files]
 astroid = [
@@ -1087,8 +1087,8 @@ pytest-metadata = [
     {file = "pytest_metadata-2.0.0-py3-none-any.whl", hash = "sha256:e25f1a77ed02baf1d83911604247a70d60d7dcb970aa12be38e1ed58d4d38e65"},
 ]
 pyupgrade = [
-    {file = "pyupgrade-2.32.0-py2.py3-none-any.whl", hash = "sha256:f45d4afb6ccdf7b0cea757958d0a11306324052668d9ff99d2bcb06bda46c00d"},
-    {file = "pyupgrade-2.32.0.tar.gz", hash = "sha256:6878116d364b72f0c0011dd62dfe96425041a5f753da298b6eacde0f9fd9c004"},
+    {file = "pyupgrade-2.32.1-py2.py3-none-any.whl", hash = "sha256:d874f34870abadd7536c89678f9811076d5df93c13620f90a125355a2d31fa91"},
+    {file = "pyupgrade-2.32.1.tar.gz", hash = "sha256:11e2c3e4e2e53a61b2d8852ed154ea5683887b6ac42561622ca8d89c94fd951a"},
 ]
 pyyaml = [
     {file = "PyYAML-6.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d4db7c7aef085872ef65a8fd7d6d09a14ae91f691dec3e87ee5ee0539d516f53"},
