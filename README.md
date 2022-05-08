@@ -35,9 +35,10 @@ poetry add pydastic
 ```
 
 
-## 🚀 Features
+## 🚀 Core Features
 - Simple CRUD operations supported
-- Dynamic index support when committing operation
+- Sessions for simplifying bulk operations (a la SQLAlchemy)
+- Dynamic index support when committing operations
 
 
 ## 📋 Usage
@@ -69,7 +70,8 @@ connect(hosts="localhost:9200")
 ```python
 # Create and save doc
 user = User(name="John", age=20)
-user.save(wait_for=True)
+user.save(wait_for=True)  # wait_for explained below
+
 assert user.id != None
 
 # Update doc
@@ -91,6 +93,62 @@ user.save(wait_for=True)
 user.delete(wait_for=True)
 ```
 
+### Sessions
+Sessions are inspired by [SQL Alchemy](https://docs.sqlalchemy.org/en/14/orm/tutorial.html)'s sessions, and are used for simplifying bulk operations using the Elasticsearch client. From what I've seen, the ES client makes it pretty hard to use the bulk API, so they created bulk helpers (which in turn have incomplete/wrong docs).
+
+
+```python
+john = User(name="John")
+sarah = User(name="Sarah")
+
+with Session() as session:
+    session.save(john)
+    session.save(sarah)
+    session.commit()
+```
+
+With an ORM, bulk operations can be exposed neatly through a simple API. Pydastic also offers more informative errors on issues encountered during bulk operations. This is possible by suppressing the built-in elastic client errors and extracting more verbose ones instead.
+
+Example error:
+
+```json
+pydastic.error.BulkError: [
+    {
+        "update": {
+            "_index": "user",
+            "_type": "_doc",
+            "_id": "test",
+            "status": 404,
+            "error": {
+                "type": "document_missing_exception",
+                "reason": "[_doc][test]: document missing",
+                "index_uuid": "cKD0254aQRWF-E2TMxHa4Q",
+                "shard": "0",
+                "index": "user"
+            }
+        }
+    },
+    {
+        "update": {
+            "_index": "user",
+            "_type": "_doc",
+            "_id": "test2",
+            "status": 404,
+            "error": {
+                "type": "document_missing_exception",
+                "reason": "[_doc][test2]: document missing",
+                "index_uuid": "cKD0254aQRWF-E2TMxHa4Q",
+                "shard": "0",
+                "index": "user"
+            }
+        }
+    }
+]
+```
+
+The sessions API will also be available through a context manager before the v1.0 release.
+
+
 ### Dynamic Index Support
 Pydastic also supports dynamic index specification. The model Metaclass index definition is still mandatory, but if an index is specified when performing operations, that will be used instead.
 The model Metaclass index is technically a fallback, although most users will probably be using a single index per model. For some users, multiple indices per model are needed (for example one user index per company).
@@ -101,6 +159,16 @@ user.save(index="my-user", wait_for=True)
 
 user.delete(index="my-user", wait_for=True)
 ```
+
+
+### Notes on testing
+When writing tests with Pydastic (even applies when writing tests with the elasticsearch client), remember to use the `wait_for=True` argument when executing operations. If this is not used, then the test will continue executing even if Elasticsearch hasn't propagated the change to all nodes, giving you weird results.
+
+For example if you save a document, then try getting it directly after, you'll get a document not found error. This is solved by using the wait_for argument in Pydastic (equivalent to `refresh="wait_for"` in Elasticsearch)
+
+Here is [a reference](https://elasticsearch-py.readthedocs.io/en/v8.2.0/api.html#elasticsearch.Elasticsearch.index) to where this argument is listed in the docs. 
+
+It's also supported in the bulk helpers even though its not mentioned in their docs, but you wouldn't figure that out unless you dug into their source and traced back several function calls where `*args` `**kwargs` are just being forwarded across calls.. :)
 
 ## Support Elasticsearch Versions
 

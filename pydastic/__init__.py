@@ -18,8 +18,21 @@ def get_version() -> str:
 
 version: str = get_version()
 
-from pydastic.error import NotFoundError
+from pydastic.error import (
+    InvalidElasticsearchResponse,
+    InvalidModelError,
+    NotFoundError,
+)
 from pydastic.model import ESModel
 from pydastic.pydastic import PydasticClient, connect
+from pydastic.session import Session
 
-__all__ = ["ESModel", "NotFoundError", "PydasticClient", "connect"]
+__all__ = [
+    "ESModel",
+    "Session",
+    "NotFoundError",
+    "InvalidModelError",
+    "InvalidElasticsearchResponse",
+    "PydasticClient",
+    "connect",
+]
