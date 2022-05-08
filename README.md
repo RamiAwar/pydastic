@@ -40,6 +40,9 @@ poetry add pydastic
 - Sessions for simplifying bulk operations (a la SQLAlchemy)
 - Dynamic index support when committing operations
 
+## In Development
+- Search API (for now, exposed client can be used)
+
 
 ## 📋 Usage
 
@@ -160,6 +163,9 @@ user.save(index="my-user", wait_for=True)
 user.delete(index="my-user", wait_for=True)
 ```
 
+### Search API
+Still haven't got an idea on how to wrap the underlying API productively. Unless I create a DSL from scratch or use elasticsearch-dsl (which I don't like due to lacking documentation), I can't really provide any value on top of the client's built-in search API. Give this a minute of thought and shoot me your suggestions if you come up with anything!
+
 
 ### Notes on testing
 When writing tests with Pydastic (even applies when writing tests with the elasticsearch client), remember to use the `wait_for=True` argument when executing operations. If this is not used, then the test will continue executing even if Elasticsearch hasn't propagated the change to all nodes, giving you weird results.
@@ -184,6 +190,7 @@ You can see the list of available releases on the [GitHub Releases](https://gith
 We follow [Semantic Versions](https://semver.org/) specification.
 
 We use [`Release Drafter`](https://github.com/marketplace/actions/release-drafter). As pull requests are merged, a draft release is kept up-to-date listing the changes, ready to publish when you’re ready. With the categories option, you can categorize pull requests in release notes using labels.
+
 
 ## 🛡 License
 
