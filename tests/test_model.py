@@ -112,9 +112,6 @@ def test_model_save_additional_fields(es: Elasticsearch):
     assert dict(user_dict, **extra_fields) == user_dict
 
 
-# TODO: Test partial updates (to dict, exclude = True) -> maybe provide a partial api?
-
-
 def test_model_ignores_additional_fields(es: Elasticsearch):
     extra_fields = {"name": "John", "location": "Seattle", "manager_ids": ["Pam", "Sam"]}
     res = es.index(index=User.Meta.index, body=extra_fields)

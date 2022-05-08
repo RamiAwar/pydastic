@@ -35,9 +35,10 @@ poetry add pydastic
 ```
 
 
-## 🚀 Features
+## 🚀 Core Features
 - Simple CRUD operations supported
-- Dynamic index support when committing operation
+- Sessions for simplifying bulk operations (a la SQLAlchemy)
+- Dynamic index support when committing operations
 
 
 ## 📋 Usage
