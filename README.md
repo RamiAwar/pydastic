@@ -154,7 +154,7 @@ The sessions API will also be available through a context manager before the v1.
 
 ### Dynamic Index Support
 Pydastic also supports dynamic index specification. The model Metaclass index definition is still mandatory, but if an index is specified when performing operations, that will be used instead.
-The model Metaclass index is technically a fallback, although most users will probably be using a single index per model. For some users, multiple indices per model are needed (for example one user index per company).
+The model Metaclass index is technically a fallback, although most users will probably be using a single index per model. For some users, multiple indices per model are needed (for example in B2B businesses, one user index per client/company is needed to keep the data separated between clients).
 
 ```python
 user = User(name="Marie")
