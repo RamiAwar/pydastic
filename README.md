@@ -178,8 +178,7 @@ It's also supported in the bulk helpers even though its not mentioned in their d
 
 ## Support Elasticsearch Versions
 
-Part of the build flow is running the tests using elasticsearch 7.12.0 DB as well as python client, and using 8.1.2 as well (DB as well as client, as part of a build matrix).
-This ensures support for multiple versions.
+Part of the build flow is running the tests using elasticsearch 7.12.0 DB as well as a 7.12.0 elasticsearch-python client. Another part is using 8.1.2 as well (DB as well as client, as part of a build matrix). This ensures support for multiple versions.
 
 ## 📈 Releases
 
