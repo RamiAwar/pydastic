@@ -223,7 +223,7 @@ requests = ["requests (>=2.4.0,<3.0.0)"]
 
 [[package]]
 name = "filelock"
-version = "3.6.0"
+version = "3.7.1"
 description = "A platform independent file lock."
 category = "dev"
 optional = false
@@ -886,8 +886,8 @@ elasticsearch = [
     {file = "elasticsearch-8.1.2.tar.gz", hash = "sha256:bf031b44c483f6dc40d607186103d8a152ce4ade96e4ed4c656f2421f794e123"},
 ]
 filelock = [
-    {file = "filelock-3.6.0-py3-none-any.whl", hash = "sha256:f8314284bfffbdcfa0ff3d7992b023d4c628ced6feb957351d4c48d059f56bc0"},
-    {file = "filelock-3.6.0.tar.gz", hash = "sha256:9cd540a9352e432c7246a48fe4e8712b10acb1df2ad1f30e8c070b82ae1fed85"},
+    {file = "filelock-3.7.1-py3-none-any.whl", hash = "sha256:37def7b658813cda163b56fc564cdc75e86d338246458c4c28ae84cabefa2404"},
+    {file = "filelock-3.7.1.tar.gz", hash = "sha256:3a0fd85166ad9dbab54c9aec96737b744106dc5f15c0b09a6744a445299fcf04"},
 ]
 gitdb = [
     {file = "gitdb-4.0.9-py3-none-any.whl", hash = "sha256:8033ad4e853066ba6ca92050b9df2f89301b8fc8bf7e9324d412a63f8bf1a8fd"},
