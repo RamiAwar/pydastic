@@ -208,7 +208,7 @@ develop = ["pytest", "pytest-cov", "pytest-mock", "pytest-asyncio", "pytest-http
 
 [[package]]
 name = "elasticsearch"
-version = "8.1.2"
+version = "8.3.1"
 description = "Python client for Elasticsearch"
 category = "main"
 optional = false
@@ -750,7 +750,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "b6abfa16cf652413475c2c1801f72a94190eaab7757d0ac43df2fe8ae13205e5"
+content-hash = "68862ee02acd948acd815c3c9a858fb588ccbf9aee3c4a7827e279ae2fd1f086"
 
 [metadata.files]
 astroid = [
@@ -882,8 +882,8 @@ elastic-transport = [
     {file = "elastic_transport-8.1.2-py3-none-any.whl", hash = "sha256:10914d0c5c268d9dcfee02cfbef861382d098309ba4eedab820062841bd214b3"},
 ]
 elasticsearch = [
-    {file = "elasticsearch-8.1.2-py3-none-any.whl", hash = "sha256:2fd3c88bc5fef259ab936538287404b2c3c5956630944563722d5b16a4edc550"},
-    {file = "elasticsearch-8.1.2.tar.gz", hash = "sha256:bf031b44c483f6dc40d607186103d8a152ce4ade96e4ed4c656f2421f794e123"},
+    {file = "elasticsearch-8.3.1-py3-none-any.whl", hash = "sha256:c29e9e59bfbe345f4a03877e5087aa93fdf7556ef538f52ebdfc26a89bbcdbb1"},
+    {file = "elasticsearch-8.3.1.tar.gz", hash = "sha256:bd6c3b8c751114f42c0265646a202da0f00f6337a9e334b4abc60ef03d1aad7c"},
 ]
 filelock = [
     {file = "filelock-3.6.0-py3-none-any.whl", hash = "sha256:f8314284bfffbdcfa0ff3d7992b023d4c628ced6feb957351d4c48d059f56bc0"},
