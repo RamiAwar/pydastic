@@ -559,14 +559,14 @@ pytest-metadata = "*"
 
 [[package]]
 name = "pytest-metadata"
-version = "2.0.0"
+version = "2.0.2"
 description = "pytest plugin for test session metadata"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-pytest = ">=7.1.1,<8.0.0"
+pytest = ">=3.0.0,<8.0.0"
 
 [[package]]
 name = "pyupgrade"
@@ -1083,8 +1083,8 @@ pytest-html = [
     {file = "pytest_html-3.1.1-py3-none-any.whl", hash = "sha256:b7f82f123936a3f4d2950bc993c2c1ca09ce262c9ae12f9ac763a2401380b455"},
 ]
 pytest-metadata = [
-    {file = "pytest-metadata-2.0.0.tar.gz", hash = "sha256:08dcc2779f4393309dd6d341ea1ddc15265239b6c4d51671737e784406ec07dc"},
-    {file = "pytest_metadata-2.0.0-py3-none-any.whl", hash = "sha256:e25f1a77ed02baf1d83911604247a70d60d7dcb970aa12be38e1ed58d4d38e65"},
+    {file = "pytest-metadata-2.0.2.tar.gz", hash = "sha256:fcd2f416f15be295943527b3c8ba16a44ae5a7141939c90c3dc5ce9d167cf2a5"},
+    {file = "pytest_metadata-2.0.2-py3-none-any.whl", hash = "sha256:39261ee0086f17649b180baf2a8633e1922a4c4b6fcc28a2de7d8127a82541bf"},
 ]
 pyupgrade = [
     {file = "pyupgrade-2.32.1-py2.py3-none-any.whl", hash = "sha256:d874f34870abadd7536c89678f9811076d5df93c13620f90a125355a2d31fa91"},
