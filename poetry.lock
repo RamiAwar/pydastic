@@ -208,7 +208,7 @@ develop = ["pytest", "pytest-cov", "pytest-mock", "pytest-asyncio", "pytest-http
 
 [[package]]
 name = "elasticsearch"
-version = "8.1.2"
+version = "8.3.3"
 description = "Python client for Elasticsearch"
 category = "main"
 optional = false
@@ -419,8 +419,8 @@ python-versions = ">=3.6"
 importlib-metadata = {version = ">=0.12", markers = "python_version < \"3.8\""}
 
 [package.extras]
-dev = ["pre-commit", "tox"]
-testing = ["pytest", "pytest-benchmark"]
+testing = ["pytest-benchmark", "pytest"]
+dev = ["tox", "pre-commit"]
 
 [[package]]
 name = "pre-commit"
@@ -543,7 +543,7 @@ coverage = {version = ">=5.2.1", extras = ["toml"]}
 pytest = ">=4.6"
 
 [package.extras]
-testing = ["fields", "hunter", "process-tests", "six", "pytest-xdist", "virtualenv"]
+testing = ["virtualenv", "pytest-xdist", "six", "process-tests", "hunter", "fields"]
 
 [[package]]
 name = "pytest-html"
@@ -750,7 +750,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "b6abfa16cf652413475c2c1801f72a94190eaab7757d0ac43df2fe8ae13205e5"
+content-hash = "33f7197c56c3fe26d317f32919ce83a729ae1b67ae19b849d31b66165569b9c5"
 
 [metadata.files]
 astroid = [
@@ -882,8 +882,8 @@ elastic-transport = [
     {file = "elastic_transport-8.1.2-py3-none-any.whl", hash = "sha256:10914d0c5c268d9dcfee02cfbef861382d098309ba4eedab820062841bd214b3"},
 ]
 elasticsearch = [
-    {file = "elasticsearch-8.1.2-py3-none-any.whl", hash = "sha256:2fd3c88bc5fef259ab936538287404b2c3c5956630944563722d5b16a4edc550"},
-    {file = "elasticsearch-8.1.2.tar.gz", hash = "sha256:bf031b44c483f6dc40d607186103d8a152ce4ade96e4ed4c656f2421f794e123"},
+    {file = "elasticsearch-8.3.3-py3-none-any.whl", hash = "sha256:bdf8a81ca3a9f9987e7bd7cd277a2679184e96499603d52842b3245de9d00db4"},
+    {file = "elasticsearch-8.3.3.tar.gz", hash = "sha256:4aa00a668fa45bbb474295db4766dd6f6115e49286c11ebcabfaa5ffa7e063de"},
 ]
 filelock = [
     {file = "filelock-3.6.0-py3-none-any.whl", hash = "sha256:f8314284bfffbdcfa0ff3d7992b023d4c628ced6feb957351d4c48d059f56bc0"},
