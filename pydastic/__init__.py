@@ -23,16 +23,18 @@ from pydastic.error import (
     InvalidModelError,
     NotFoundError,
 )
-from pydastic.model import ESModel
-from pydastic.pydastic import PydasticClient, connect
+from pydastic.model import ESAsyncModel, ESModel
+from pydastic.pydastic import PydasticClient, connect, connect_async
 from pydastic.session import Session
 
 __all__ = [
     "ESModel",
+    "ESAsyncModel",
     "Session",
     "NotFoundError",
     "InvalidModelError",
     "InvalidElasticsearchResponse",
     "PydasticClient",
     "connect",
+    "connect_async",
 ]
