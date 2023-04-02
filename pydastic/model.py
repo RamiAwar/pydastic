@@ -1,5 +1,7 @@
+from abc import ABC, abstractmethod
 from copy import copy
 from datetime import datetime
+from functools import partial
 from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar, Union
 
 from elasticsearch import NotFoundError as ElasticNotFoundError
@@ -124,20 +126,11 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         Args:
             index (str, optional): Index name
             wait_for (bool, optional): Waits for all shards to sync before returning response - useful when writing tests. Defaults to False.
+
+        Returns:
+            New document ID
         """
-        doc = self.dict(exclude={"id"})
-
-        # Allow waiting for shards - useful when testing
-        refresh = "false"
-        if wait_for:
-            refresh = "wait_for"
-
-        # Use user-provided index if provided (dynamic index support)
-        if not index:
-            index = self.Meta.index
-
-        res = _client.client.index(index=index, body=doc, id=self.id, refresh=refresh)
-        self.id = res.get("_id")
+        return Save(index=index, wait_for=wait_for, model=self).sync()
 
     @classmethod
     def get(cls: Type[M], id: str, extra_fields: Optional[bool] = False, index: Optional[str] = None) -> M:
@@ -154,25 +147,10 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         Raises:
             NotFoundError: Returned if document not found
         """
-        source_includes = None
-        if not extra_fields:
-            fields: dict = copy(vars(cls).get("__fields__"))
-            fields.pop("id", None)
-            source_includes = list(fields.keys())
-
-        # Use user-provided index if provided (dynamic index support)
-        if not index:
-            index = cls.Meta.index
-
         try:
-            res = _client.client.get(index=index, id=id, _source_includes=source_includes)
+            return Get(model=cls, id_=id, index=index, extra_fields=extra_fields).sync()
         except ElasticNotFoundError:
             raise NotFoundError(f"document with id {id} not found")
-
-        model = cls.from_es(res)
-        model.id = id
-
-        return model
 
     def delete(self: Type[M], index: Optional[str] = None, wait_for: Optional[bool] = False):
         """Deletes document from elasticsearch.
@@ -187,17 +165,170 @@ class ESModel(BaseModel, metaclass=ESModelMeta):
         """
         if not self.id:
             raise ValueError("id missing from object")
-
-        # Allow waiting for shards - useful when testing
-        refresh = "false"
-        if wait_for:
-            refresh = "wait_for"
-
-        # Use user-provided index if provided (dynamic index support)
-        if not index:
-            index = self.Meta.index
-
         try:
-            _client.client.delete(index=index, id=self.id, refresh=refresh)
+            Delete(index=index, model=self).sync()
         except ElasticNotFoundError:
             raise NotFoundError(f"document with id {id} not found")
+
+
+class ESAsyncModel(ESModel):
+    class Meta:
+        @property
+        def index(self) -> str:
+            """Elasticsearch index name associated with this model class"""
+            raise NotImplementedError
+
+    async def save(self: Type[M], index: Optional[str] = None, wait_for: Optional[bool] = False):
+        """Indexes document into elasticsearch.
+        If document already exists, existing document will be updated as per native elasticsearch index operation.
+        If model instance includes an 'id' property, this will be used as the elasticsearch _id.
+        If no 'id' is provided, then document will be indexed and elasticsearch will generate a suitable id that will be populated on the returned model.
+
+        Args:
+            index (str, optional): Index name
+            wait_for (bool, optional): Waits for all shards to sync before returning response - useful when writing tests. Defaults to False.
+
+        Returns:
+            New document ID
+        """
+        return await Save(index=index, wait_for=wait_for, model=self).asyncio()
+
+    @classmethod
+    async def get(cls: Type[M], id: str, extra_fields: Optional[bool] = False, index: Optional[str] = None) -> M:
+        """Fetches document and returns ESModel instance populated with properties.
+
+        Args:
+            id (str): Document id
+            extra_fields (bool, Optional): Include fields found in elasticsearch but not part of the model definition
+            index (str, optional): Index name
+
+        Returns:
+            ESAsyncModel
+
+        Raises:
+            NotFoundError: Returned if document not found
+        """
+        get = Get(model=cls, id_=id, extra_fields=extra_fields, index=index)
+        try:
+            return await get.asyncio()
+        except ElasticNotFoundError:
+            raise NotFoundError(f"document with id {id} not found")
+
+    async def delete(self: Type[M], index: Optional[str] = None, wait_for: Optional[bool] = False):
+        """Deletes document from elasticsearch.
+
+        Args:
+            index (str, optional): Index name
+            wait_for (bool, optional): Waits for all shards to sync before returning response - useful when writing tests. Defaults to False.
+
+        Raises:
+            NotFoundError: Returned if document not found
+            ValueError: Returned when id attribute missing from instance
+        """
+        if not self.id:
+            raise ValueError("id missing from object")
+        try:
+            await Delete(index=index, model=self, wait_for=wait_for).asyncio()
+        except ElasticNotFoundError:
+            raise NotFoundError(f"document with id {id} not found")
+
+
+class BaseESOperation(ABC):
+    """Abstract class of ES operation: save, get, delete
+
+    Each subclass should set INDEX_METHOD_NAME which is the ES client function to run
+    initiator (__init__) is used as pre-operation activity.
+    """
+
+    INDEX_METHOD_NAME: Optional[str] = None
+
+    def __init__(self, model: Type[M], index: str, wait_for: Optional[bool] = None):
+        if self.INDEX_METHOD_NAME is None:
+            raise AttributeError(f"Must set INDEX_METHOD_NAME variable for class {self.__class__.__name__}")
+        self._es_client_func = getattr(_client.client, self.INDEX_METHOD_NAME)
+
+        self.model = model
+        self.index = index
+        if wait_for is not None:
+            # Allow waiting for shards - useful when testing
+            self.refresh = "wait_for" if wait_for else "false"
+
+    @abstractmethod
+    @property
+    def kwargs(self):
+        """ES operation kwargs"""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def post(self, *args, **kwargs):
+        """Post activites after ES operation is done"""
+        # do nothing by default
+        raise NotImplementedError()
+
+    def sync(self):
+        """Run in blocking mode"""
+        es_result = self._es_callable()
+        return self.post(es_result=es_result)
+
+    async def asyncio(self):
+        """Run in async mode"""
+        es_result = await self._es_callable()
+        return self.post(es_result=es_result)
+
+    @property
+    def _es_callable(self) -> callable:
+        return partial(self._es_client_func, **self.kwargs)
+
+
+class Get(BaseESOperation):
+    INDEX_METHOD_NAME = "get"
+
+    def __init__(self, model: Type[M], id_: str, index: Optional[str] = None, extra_fields: Optional[bool] = False):
+        super().__init__(index=index, model=model)
+        self.id = id_
+
+        self.source_includes = None
+        if not extra_fields:
+            fields: dict = copy(vars(model).get("__fields__"))
+            fields.pop("id", None)
+            self.source_includes = list(fields.keys())
+
+    @property
+    def kwargs(self):
+        return dict(index=self.index, id=self.id, _source_includes=self.source_includes)
+
+    def post(self, es_result: dict) -> M:
+        model = self.model.from_es(es_result)
+        model.id = self.id
+        return model
+
+
+class Save(BaseESOperation):
+    INDEX_METHOD_NAME = "index"
+
+    def __init__(self, model: Type[M], index: Optional[str] = None, wait_for: Optional[bool] = False):
+        super().__init__(model=model, index=index, wait_for=wait_for)
+        self.doc = self.model.dict(exclude={"id"})
+
+    def post(self, es_result: dict) -> str:
+        self.model.id = es_result.get("_id")
+        return self.model.id
+
+    @property
+    def kwargs(self):
+        return dict(index=self.index, doc=self.doc, id=self.model.id, refresh=self.refresh)
+
+
+class Delete(BaseESOperation):
+
+    INDEX_METHOD_NAME = "delete"
+
+    def __init__(self, model: Type[M], index: Optional[str] = None, wait_for: Optional[bool] = False):
+        super().__init__(model=model, index=index, wait_for=wait_for)
+
+    @property
+    def kwargs(self):
+        return dict(index=self.index, id=self.model.id, refresh=self.refresh)
+
+    def post(self, es_result: dict) -> None:
+        return None
